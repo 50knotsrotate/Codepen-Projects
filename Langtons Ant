@@ -1,0 +1,94 @@
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+let grid = [];
+let rows = 100;
+
+let ant = { x: rows / 2, y: rows / 2, direction: 0 };
+setInterval(Ant, 1);
+let colors = [
+  "DeepSkyBlue",
+  "red",
+  "gold",
+  "Indigo",
+  "green",
+  "pink",
+  "cyan",
+  "orange",
+  "white"
+];
+
+function Ant() {
+  drawGrid();
+  switchCell();
+  moveAnt();
+}
+
+//create a 2x2 array
+
+for (let i = 0; i < rows; i++) {
+  let _TEMP = [];
+  for (let j = 0; j < rows; j++) {
+    _TEMP.push({
+      x: i * (canvas.width / rows),
+      y: j * (canvas.height / rows),
+      status: false,
+      color: 0
+    });
+  }
+  grid.push(_TEMP);
+}
+
+function drawGrid() {
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      context.beginPath();
+      if (grid[i][j].status) {
+        context.fillStyle = colors[grid[i][j].color];
+      } else if (grid[i][j].status == false) {
+        context.fillStyle = "black";
+      }
+      context.rect(
+        grid[i][j].x,
+        grid[i][j].y,
+        canvas.width / rows,
+        canvas.height / rows
+      );
+      context.fill();
+    }
+  }
+}
+
+function switchCell() {
+  ant.x = (ant.x + rows) % rows;
+  ant.y = (ant.y + rows) % rows;
+  var currentCell = grid[ant.x][ant.y];
+
+  if (currentCell.status) {
+    ant.direction += 1;
+    currentCell.status = false;
+  } else {
+    ant.direction -= 1;
+    currentCell.status = true;
+    currentCell.color = (currentCell.color + 1) % colors.length;
+  }
+}
+
+function moveAnt() {
+  switch (Math.abs(ant.direction % 4)) {
+    case 0:
+      ant.x += 1;
+      break;
+
+    case 1:
+      ant.y -= 1;
+      break;
+
+    case 2:
+      ant.x -= 1;
+      break;
+    case 3:
+      ant.y += 1;
+      break;
+  }
+}
