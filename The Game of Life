@@ -1,0 +1,100 @@
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const rows = 100; //easily change numbers of cells by changing this variable.
+
+
+let grid = [];
+let newGrid = grid;
+
+//draws inital grid before canvas is clicked. Not neccesary, just makes it look nicer.
+makeGrid();
+drawGrid();
+
+//once canvas is clicked, it triggers the simulation
+canvas.addEventListener("click", play);
+
+function play() {
+  setInterval(gameOfLife, 70);
+}
+
+function gameOfLife() {
+  checkGrid();
+  drawGrid();
+}
+
+//makes 2x2 array of objects
+function makeGrid() {
+  let _TEMP;
+  for (let i = 0; i < rows; i++) {
+    _TEMP = [];
+    for (let j = 0; j < rows; j++) {
+      _TEMP.push({
+        x: j * (canvas.width / rows),
+        y: i * (canvas.height / rows),
+        //each cells status is randomly generated
+        status: Math.random() >= 0.91
+      });
+    }
+    grid.push(_TEMP);
+  }
+}
+
+//draws the grid to the canvas, if the cell is alive(true), draw a black cell, if the cell is dead(false), draw a white cell
+function drawGrid() {
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      context.beginPath();
+      if (grid[i][j].status) {
+        context.fillStyle = "black";
+      } else {
+        context.fillStyle = "white";
+      }
+      context.rect(
+        grid[i][j].x,
+        grid[i][j].y,
+        canvas.width / rows,
+        canvas.height / rows
+      );
+      context.fill();
+      context.stroke();
+    }
+  }
+}
+
+//loop through each cell in the grid
+function checkGrid() {
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      newGrid[i][j] = {
+        x: grid[i][j].x,
+        y: grid[i][j].y,
+        status: countLive(i, j) //this function takes the current cells location on the grid as parameters, and counts the neighbors.
+      };
+    }
+  }
+
+  grid = newGrid;
+}
+
+function countLive(x, y) {
+  let counter = 0;
+  for (let i = -1; i < 2; i++) {
+    for (let j = -1; j < 2; j++) {
+      if (i == 0 && j == 0) {
+        // we dont want to count the current cell against itself. This would ruin everything.
+        continue;
+      }
+      let col = (x + i + rows) % rows; // these variables allow me to implement a wrap around.
+      let row = (y + j + rows) % rows;
+      if (grid[col][row].status) {
+        counter += 1;
+      }
+    }
+  }
+  //this is where the magic happens. if the current cell is alive, it stays alive if it has 2 OR 3 live(white) neighbors. If it is dead, it becomes alive if it has exactly 3 live neighbors. Otherwise, it stays dead.
+  if (grid[x][y].status) {
+    return counter == 2 || counter == 3;
+  } else {
+    return counter == 3;
+  }
+}
