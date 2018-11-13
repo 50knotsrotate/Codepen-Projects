@@ -4,6 +4,7 @@ const bubbleSize = 2;
 let bubbles = [];
 let bubbleX;
 let bubbleY;
+let glued = { x: canvas.width / 2, y: canvas.height / 2 };
 
 for (let i = 0; i < 750; i++) {
   bubbles.push({
@@ -13,7 +14,7 @@ for (let i = 0; i < 750; i++) {
   });
 }
 canvas.addEventListener('click',diffusion)
-let glued = { x: canvas.width / 2, y: canvas.height / 2 };
+
 
 function diffusion(){
 setInterval(bubblesGo, 1);
@@ -23,10 +24,10 @@ function bubblesGo() {
   updateBubbles();
   checkGlued();
 }
-//
+
 function updateBubbles() {
   for (let i = 0; i < bubbles.length; i++) {
-    bubbleX = Math.floor(Math.random() * (5)) - 2; //3,-1
+    bubbleX = Math.floor(Math.random() * (5)) - 2;
     bubbleY = Math.floor(Math.random() * (5)) - 2;
     if (bubbles[i].glued == false) {
       bubbles[i].x += bubbleX;
