@@ -1,0 +1,103 @@
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const bubbleSize = 2;
+let bubbles = [];
+let bubbleX;
+let bubbleY;
+
+for (let i = 0; i < 750; i++) {
+  bubbles.push({
+    x: Math.floor(Math.random() * canvas.width),
+    y: Math.floor(Math.random() * canvas.height),
+    glued: false
+  });
+}
+canvas.addEventListener('click',diffusion)
+let glued = { x: canvas.width / 2, y: canvas.height / 2 };
+
+function diffusion(){
+setInterval(bubblesGo, 1);
+}
+function bubblesGo() {
+  drawBubbles();
+  updateBubbles();
+  checkGlued();
+}
+//
+function updateBubbles() {
+  for (let i = 0; i < bubbles.length; i++) {
+    bubbleX = Math.floor(Math.random() * (5)) - 2; //3,-1
+    bubbleY = Math.floor(Math.random() * (5)) - 2;
+    if (bubbles[i].glued == false) {
+      bubbles[i].x += bubbleX;
+      bubbles[i].y += bubbleY;
+
+      if (bubbles[i].x >= canvas.width + bubbleSize) {
+        bubbles[i].x = bubbleSize;
+      }
+
+      if (bubbles[i].x < -bubbleSize) {
+        bubbles[i].x = canvas.width - bubbleSize;
+      }
+      if (bubbles[i].y > canvas.height + bubbleSize) {
+        bubbles[i].y = bubbleSize;
+      }
+
+      if (bubbles[i].y < -bubbleSize) {
+        bubbles[i].y = canvas.height - bubbleSize;
+      }
+    }
+    if (
+      Math.sqrt(
+        Math.abs(bubbles[i].x - glued.x) ** 2 +
+          Math.abs(bubbles[i].y - glued.y) ** 2
+      ) <=
+        bubbleSize * 2 &&
+      bubbles[i].glued == false
+    ) {
+      bubbles[i].glued = true;
+    }
+  }
+}
+function drawBubbles() {
+  
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < bubbles.length; i++) {
+    context.beginPath();
+    if (bubbles[i].glued == false) {
+      context.fillStyle = "red";
+    }
+
+    if (bubbles[i].glued == true) {
+      context.fillStyle = 'blue'
+    }
+    context.arc(bubbles[i].x, bubbles[i].y, bubbleSize, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.beginPath();
+  context.fillStyle = "darkred";
+  context.arc(glued.x, glued.y, bubbleSize, 0, Math.PI * 2);
+  context.fill();
+}
+//
+function checkGlued() {
+  for (let i = 0; i < bubbles.length; i++) {
+    if(bubbles[i].glued == true){continue}//if the bubble is already glued, ignore
+    for (let j = 0; j < bubbles.length; j++) {
+      if (j == i) {
+        continue; //dont check a bubble against itself
+      }
+      //if a non-glued bubble touches a glued bubble, that bubble becomes glued
+      if (
+        Math.sqrt(
+          Math.abs(bubbles[j].x - bubbles[i].x) ** 2 +
+            Math.abs(bubbles[j].y - bubbles[i].y) ** 2
+        ) <=
+          bubbleSize * 2 &&
+        bubbles[j].glued == true
+      ) {
+        bubbles[i].glued = true;
+      }
+    }
+  }
+}
