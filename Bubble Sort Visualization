@@ -1,0 +1,56 @@
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const width = 600;
+const height = 600;
+
+var bars =175; //change this variable to change number of bars to be sorted
+let barsArray = [];
+//make bars
+for (let i = 0; i < bars; i++) {
+  barsArray.push({
+    x: i * (width / bars),
+    height: Math.random() * canvas.height,
+    width: width / bars
+  });
+}
+var current = 0;
+var end = barsArray.length - 1;
+
+setInterval(sort, 1)
+function sort() {
+  drawBars();
+  sortBars();
+}
+
+function drawBars() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < barsArray.length; i++) {
+    context.beginPath();
+    context.fillStyle = "blue";
+    context.rect(
+      barsArray[i].x / 2,
+      0,
+      barsArray[i].width / 2,
+      barsArray[i].height
+    );
+    context.fill();
+    context.stroke();
+  }
+}
+
+function sortBars() {
+  var _TEMP;
+  if (barsArray[current].height > barsArray[current + 1].height) {
+    _TEMP = barsArray[current].height;
+    barsArray[current].height = barsArray[current+1].height;
+    barsArray[current+1].height = _TEMP;
+  }
+  
+  //this funny looking code is responsible for checking one less bar after each iteration.
+  //translation: 
+  current = current + 1; //check next bar
+  if (current == end) { //when it gets to the last sorted bar,
+    current = 0;// go back to the start
+    end--;// and check one less next time
+  }
+}
