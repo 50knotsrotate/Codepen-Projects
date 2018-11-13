@@ -1,0 +1,120 @@
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+let x = 5; //controls the length of the snake starting out
+let snakeXSpeed = 5; 
+let snakeYSpeed = 0;
+var snake = [];
+var snakeSize = 5;//size of snake & food
+//Makes random number between 0 and canvas size that is divisible by 5
+let Foodx = Math.floor(Math.random() * canvas.width / 5) * 5;
+let Foody = Math.floor(Math.random() * canvas.height / 5) * 5;
+
+document.addEventListener("keydown", keyPressed);
+
+function makeSnake() {
+  snakeXSpeed = 5;
+  snakeYSpeed = 0;
+  for (let i = 0; i < x; i++) {
+    snake.push({ x: i * 5, y: 20 });
+  }
+}
+makeSnake();
+
+setInterval(playSnake, 50);
+function playSnake() {
+  drawSnake();
+  updateSnake();
+  makeFood();
+  checkFoodEaten();
+  checkCollision();
+}
+
+function drawSnake() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < snake.length; i++) {
+    context.beginPath();
+    context.fillStyle = "black";
+    context.rect(snake[i].x, snake[i].y, snakeSize, snakeSize);
+    context.stroke();
+  }
+}
+
+function updateSnake() {
+  snake.shift();
+  snake.push({
+    x: snake[snake.length - 1].x + snakeXSpeed,
+    y: snake[snake.length - 1].y + snakeYSpeed
+  });
+
+  if (
+    snake[snake.length - 1].x > canvas.width - snakeSize ||
+    snake[snake.length - 1].y > canvas.height - snakeSize ||
+    snake[snake.length - 1].y < 0 ||
+    snake[snake.length - 1].x < 0
+  ) {
+    //if the snake moves beyond the canvas, reset the snake
+    snake = [];
+    makeSnake();
+  }
+}
+//control direction of snake
+function keyPressed(e) {
+  if (e.keyCode == "40" && snakeYSpeed != -5) {
+    snakeYSpeed = 5;
+    snakeXSpeed = 0;
+  }
+
+  if (e.keyCode == "39" && snakeXSpeed != -5) {
+    snakeYSpeed = 0;
+    snakeXSpeed = 5;
+  }
+
+  if (e.keyCode == "38" && snakeYSpeed != 5) {
+    snakeYSpeed = -5;
+    snakeXSpeed = 0;
+  }
+
+  if (e.keyCode == "37" && snakeXSpeed != 5) {
+    snakeYSpeed = 0;
+    snakeXSpeed = -5;
+  }
+}
+
+function makeFood() {
+  context.beginPath();
+  context.fillStyle = "red";
+  context.rect(Foodx, Foody, snakeSize, snakeSize);
+  context.fill();
+
+  for (let i = 0; i < snake.length - 1; i++) {
+    //if the food spawns inside the snake, put the food somewhere else. 
+    if (Foodx == snake[i].x && Foody == snake[i].y) {
+      Foodx = Math.floor(Math.random() * canvas.width / 5) * 5;
+      Foody = Math.floor(Math.random() * canvas.height / 5) * 5;
+    }
+  }
+}
+
+function checkFoodEaten() {
+  snakeHead = snake.length - 1;
+  if (snake[snakeHead].x == Foodx && snake[snakeHead].y == Foody) {
+    Foodx = Math.floor(Math.random() * canvas.width / 5) * 5;
+    Foody = Math.floor(Math.random() * canvas.height / 5) * 5;
+    snake.unshift({ x: snake[0].x + snakeXSpeed, y: snake[0].y + snakeYSpeed });
+   
+  }
+}
+
+function checkCollision() {
+  //if the head of the snake shares its x and y value with another part of the snake, reset the snake
+  for (let i = 0; i < snake.length - 1; i++) {
+    if (
+      snake[snake.length - 1].x == snake[i].x &&
+      snake[snake.length - 1].y == snake[i].y
+    ) {
+      snake = [];
+      makeSnake();
+    }
+  }
+  
+}
