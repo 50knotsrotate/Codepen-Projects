@@ -92,7 +92,9 @@ function countLive(x, y) {
     }
   }
   //this is where the magic happens. if the current cell is alive, it stays alive if it has 2 OR 3 live(white) neighbors. If it is dead, it becomes alive if it has exactly 3 live neighbors. Otherwise, it stays dead.
-  if (grid[x][y].status) {
+  if (grid[x][y].status) { //I found a bug, which I have now fixed. Turns out that countLive returns the wrong number only when the cell is alive.
+  //When a cell is alive, the number it returns is always one too much. I resolved this issue with counter--,
+  //but this means that the cell is counting itself when it shouldnt. I will dig deeper and find my error. For now, though, it is working properly :)
     return counter == 2 || counter == 3;
   } else {
     return counter == 3;
